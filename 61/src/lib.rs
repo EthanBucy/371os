@@ -13,6 +13,7 @@ pub mod gdt;
 pub mod interrupts;
 pub mod memory;
 pub mod serial;
+pub mod snake;
 pub mod vga;
 
 pub const QEMU_PASS: u32 = 0xA;

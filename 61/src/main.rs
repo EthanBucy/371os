@@ -4,15 +4,10 @@
 #![test_runner(osirs::_test_runner)]
 #![reexport_test_harness_main = "test_main"]
 
-extern crate alloc;
-
-use alloc::boxed::Box;
-use osirs::println;
-
 #[cfg(not(test))]
 #[panic_handler]
 fn panic(info: &core::panic::PanicInfo) -> ! {
-    println!("{}", info);
+    osirs::println!("{}", info);
     osirs::halt()
 }
 
@@ -26,12 +21,7 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
 pub extern "C" fn _start(boot_info: &'static bootloader::BootInfo) -> ! {
     osirs::init();
     osirs::init_heap(boot_info);
-
-    println!("Hello world{}!", "");
-
-    let b = Box::new(371);
-    println!("Hello box containing {}!", *b);
-    println!("Hello box at {:p}!", b);
+    osirs::snake::init();
 
     #[cfg(test)]
     test_main();

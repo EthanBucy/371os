@@ -65,7 +65,7 @@ extern "x86-interrupt" fn page_fault_handler(
 }
 
 extern "x86-interrupt" fn timer_handler(_stack_frame: InterruptStackFrame) {
-    crate::clock::tick();
+    crate::snake::on_tick();
 
     unsafe {
         PICS.notify_end_of_interrupt(InterruptIndex::Timer as u8);
@@ -77,28 +77,9 @@ extern "x86-interrupt" fn keyboard_interrupt_handler(_stack_frame: InterruptStac
 
     let mut port = Port::new(0x60);
     let scancode: u8 = unsafe { port.read() };
-
-    if let Some(digit) = digit_from_scancode(scancode) {
-        crate::clock::push_digit(digit);
-    }
+    crate::snake::on_key(scancode);
 
     unsafe {
         PICS.notify_end_of_interrupt(InterruptIndex::Keyboard as u8);
-    }
-}
-
-fn digit_from_scancode(scancode: u8) -> Option<u8> {
-    match scancode {
-        0x02 => Some(1),
-        0x03 => Some(2),
-        0x04 => Some(3),
-        0x05 => Some(4),
-        0x06 => Some(5),
-        0x07 => Some(6),
-        0x08 => Some(7),
-        0x09 => Some(8),
-        0x0a => Some(9),
-        0x0b => Some(0),
-        _ => None,
     }
 }
