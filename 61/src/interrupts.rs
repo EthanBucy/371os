@@ -1,6 +1,6 @@
 #![allow(static_mut_refs)]
 
-use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
+use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame, PageFaultErrorCode};
 
 pub const PIC_1_OFFSET: u8 = 32;
 pub const PIC_2_OFFSET: u8 = PIC_1_OFFSET + 8;
@@ -25,6 +25,8 @@ pub fn init_idt() {
             .set_handler_fn(double_fault_handler)
             .set_stack_index(crate::gdt::DOUBLE_FAULT_IST_INDEX as u16);
 
+        idt.page_fault.set_handler_fn(page_fault_handler);
+
         idt[InterruptIndex::Timer as usize].set_handler_fn(timer_handler);
         idt[InterruptIndex::Keyboard as usize].set_handler_fn(keyboard_interrupt_handler);
 
@@ -46,6 +48,20 @@ extern "x86-interrupt" fn double_fault_handler(
 ) -> ! {
     assert!(error_code == 0);
     panic!("EXCEPTION: DOUBLE FAULT\n{:#?}", stack_frame);
+}
+
+extern "x86-interrupt" fn page_fault_handler(
+    stack_frame: InterruptStackFrame,
+    error_code: PageFaultErrorCode,
+) {
+    crate::println!("EXCEPTION: PAGE FAULT");
+    crate::println!(
+        "Accessed Address: {:?}",
+        x86_64::registers::control::Cr2::read()
+    );
+    crate::println!("Error Code: {:?}", error_code);
+    crate::println!("{:#?}", stack_frame);
+    crate::halt();
 }
 
 extern "x86-interrupt" fn timer_handler(_stack_frame: InterruptStackFrame) {

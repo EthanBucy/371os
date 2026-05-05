@@ -5,21 +5,17 @@
 
 #[unsafe(no_mangle)]
 pub extern "C" fn _start() -> ! {
-    osirs::_test_runner(&[&trigger_double_fault]);
-    osirs::qemu_quit(osirs::QEMU_FAIL);
+    osirs::_test_runner(&[&init_and_continue]);
     loop {}
 }
 
-fn trigger_double_fault() {
+fn init_and_continue() {
     osirs::init();
-    unsafe {
-        core::ptr::write_volatile(0xdeadbeef as *mut u8, 42);
-    }
+    x86_64::instructions::interrupts::int3();
+    assert!(true);
 }
 
 #[panic_handler]
-fn panic(_info: &core::panic::PanicInfo) -> ! {
-    osirs::serial_println!("[Pass]");
-    osirs::qemu_quit(osirs::QEMU_PASS);
-    loop {}
+fn panic(info: &core::panic::PanicInfo) -> ! {
+    osirs::_test_panic(info)
 }

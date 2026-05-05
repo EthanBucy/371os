@@ -22,8 +22,10 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
 #[unsafe(no_mangle)]
 pub extern "C" fn _start() -> ! {
     osirs::init();
-    osirs::clock::reset();
-    println!("Enter time as HHMMSS:");
+
+    let level_4_table = x86_64::registers::control::Cr3::read().0.start_address();
+    println!("Level 4 page table at: {:?}", level_4_table);
+    println!("Page fault handler installed.");
 
     #[cfg(test)]
     test_main();
