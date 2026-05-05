@@ -1,0 +1,7 @@
+cargo:rerun-if-changed=/Users/ethan/Documents/CS/OpSystems/371os/60/Cargo.toml
+cargo:rustc-link-search=native=/Users/ethan/Documents/CS/OpSystems/371os/60/target/bootimage/bootloader/x86_64-bootloader/release/build/bootloader-6cbe734f13073bda/out
+cargo:rustc-link-lib=static=kernel_bin-should_panic-0ff76e3d318be41a
+cargo:rerun-if-env-changed=KERNEL
+cargo:rerun-if-env-changed=KERNEL_MANIFEST
+cargo:rerun-if-changed=/Users/ethan/Documents/CS/OpSystems/371os/60/target/x86_64-osirs/debug/deps/should_panic-0ff76e3d318be41a
+cargo:rerun-if-changed=build.rs
