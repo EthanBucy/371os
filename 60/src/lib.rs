@@ -4,6 +4,7 @@
 #![feature(abi_x86_interrupt)]
 #![test_runner(_test_runner)]
 
+pub mod gdt;
 pub mod interrupts;
 pub mod serial;
 pub mod vga;
@@ -12,6 +13,7 @@ pub const QEMU_PASS: u32 = 0xA;
 pub const QEMU_FAIL: u32 = 0xF;
 
 pub fn init() {
+    gdt::init_gdt();
     init_sse();
     interrupts::init_idt();
 }
