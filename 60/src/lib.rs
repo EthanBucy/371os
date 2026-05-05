@@ -18,6 +18,12 @@ pub fn init() {
     interrupts::init_idt();
 }
 
+pub fn halt() -> ! {
+    loop {
+        x86_64::instructions::hlt();
+    }
+}
+
 fn init_sse() {
     use x86_64::registers::control::{Cr0, Cr0Flags, Cr4, Cr4Flags};
 
@@ -42,7 +48,7 @@ pub fn _test_panic(info: &core::panic::PanicInfo) -> ! {
     serial_println!("[Fail]");
     serial_println!("{}", info);
     qemu_quit(QEMU_FAIL);
-    loop {}
+    halt()
 }
 
 pub fn _test_runner(tests: &[&dyn Fn()]) {
@@ -59,7 +65,7 @@ pub fn _test_runner(tests: &[&dyn Fn()]) {
 #[unsafe(no_mangle)]
 pub extern "C" fn _start() -> ! {
     _test_runner(&[]);
-    loop {}
+    halt()
 }
 
 #[cfg(test)]

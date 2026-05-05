@@ -2,6 +2,7 @@
 #![no_main]
 #![feature(custom_test_frameworks)]
 #![test_runner(osirs::_test_runner)]
+#![reexport_test_harness_main = "test_main"]
 
 use osirs::println;
 
@@ -9,7 +10,7 @@ use osirs::println;
 #[panic_handler]
 fn panic(info: &core::panic::PanicInfo) -> ! {
     println!("{}", info);
-    loop {}
+    osirs::halt()
 }
 
 #[cfg(test)]
@@ -20,16 +21,11 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
 
 #[unsafe(no_mangle)]
 pub extern "C" fn _start() -> ! {
-    println!("Hello World{}", "!");
-
     osirs::init();
-
-    x86_64::instructions::interrupts::int3();
-
-    println!("It did not crash!");
+    println!("Type HELLO WORLD:");
 
     #[cfg(test)]
-    osirs::_test_runner(&[]);
+    test_main();
 
-    loop {}
+    osirs::halt()
 }
