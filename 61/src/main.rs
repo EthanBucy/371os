@@ -4,9 +4,10 @@
 #![test_runner(osirs::_test_runner)]
 #![reexport_test_harness_main = "test_main"]
 
+extern crate alloc;
+
+use alloc::boxed::Box;
 use osirs::println;
-use x86_64::VirtAddr;
-use x86_64::structures::paging::Page;
 
 #[cfg(not(test))]
 #[panic_handler]
@@ -24,21 +25,13 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
 #[unsafe(no_mangle)]
 pub extern "C" fn _start(boot_info: &'static bootloader::BootInfo) -> ! {
     osirs::init();
+    osirs::init_heap(boot_info);
 
-    let offset = VirtAddr::new(boot_info.physical_memory_offset);
-    let mut mapper = unsafe { osirs::memory::init(offset) };
-    let mut frame_allocator =
-        unsafe { osirs::memory::BootInfoFrameAllocator::init(&boot_info.memory_map) };
+    println!("Hello world{}!", "");
 
-    let page = Page::containing_address(VirtAddr::new(0xdeadbeaf000));
-    osirs::memory::create_example_mapping(page, &mut mapper, &mut frame_allocator);
-
-    let ptr: *mut u64 = page.start_address().as_mut_ptr();
-    unsafe {
-        ptr.write_volatile(0x_f021_f077_f065_f04e);
-    }
-
-    println!("Mapping demo complete.");
+    let b = Box::new(371);
+    println!("Hello box containing {}!", *b);
+    println!("Hello box at {:p}!", b);
 
     #[cfg(test)]
     test_main();
