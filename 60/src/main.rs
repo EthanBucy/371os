@@ -20,7 +20,13 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
 
 #[unsafe(no_mangle)]
 pub extern "C" fn _start() -> ! {
-    println!("I'm main.");
+    println!("Hello World{}", "!");
+
+    osirs::init();
+
+    x86_64::instructions::interrupts::int3();
+
+    println!("It did not crash!");
 
     #[cfg(test)]
     osirs::_test_runner(&[]);
